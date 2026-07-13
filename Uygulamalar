@@ -1,0 +1,260 @@
+int ledPin = 9; // LED'in bağlı olduğu pin
+
+void setup() {
+  pinMode(ledPin, OUTPUT); // Pini çıkış olarak ayarlıyoruz
+}
+
+void loop() {
+  digitalWrite(ledPin, HIGH); // LED'e güç ver (Yak)
+  delay(1000);                // 1000 milisaniye (1 saniye) bekle
+  digitalWrite(ledPin, LOW);  // LED'in gücünü kes (Söndür)
+  delay(1000);                // 1 saniye bekle
+}
+
+
+
+/////////////////////////////////
+
+int ledPin = 9; 
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  // Parlaklığı 0'dan 255'e kadar yavaşça artır
+  for (int parlaklik = 0; parlaklik <= 255; parlaklik++) {
+    analogWrite(ledPin, parlaklik); // PWM pini için analogWrite kullanılır
+    delay(10); // Değişimi gözle görebilmek için kısa bir bekleme
+  }
+  
+  // Parlaklığı 255'ten 0'a kadar yavaşça azalt
+  for (int parlaklik = 255; parlaklik >= 0; parlaklik--) {
+    analogWrite(ledPin, parlaklik);
+    delay(10);
+  }
+}
+
+
+///////////////////////////////////////////////////
+
+
+
+int potPin = A0;   // Potansiyometrenin orta bacağının bağlı olduğu pin
+int potDeger = 0;  // Okunan değeri tutacağımız değişken
+
+void setup() {
+  Serial.begin(9600); // Bilgisayarla haberleşmeyi başlatıyoruz
+}
+
+void loop() {
+  potDeger = analogRead(potPin); // A0 pininden 0-1023 arası değeri oku
+  
+  Serial.print("Okunan Deger: ");
+  Serial.println(potDeger);      // Değeri ekrana yazdır ve alt satıra geç
+  
+  delay(100); // Ekranda değerlerin çok hızlı akmasını engellemek için
+}
+
+
+
+//////////////////////////////////////////////////////
+
+
+
+
+int potPin = A0;
+int ledPin = 9;
+int potDeger = 0;
+int parlaklik = 0;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  // 1. Sensörden veriyi oku (0 - 1023)
+  potDeger = analogRead(potPin); 
+  
+  // 2. Okunan değeri parlaklık aralığına dönüştür
+  // map(değişken, mevcut_min, mevcut_maks, hedef_min, hedef_maks)
+  parlaklik = map(potDeger, 0, 1023, 0, 255); 
+  
+  // 3. Dönüştürülen değeri LED'e gönder
+  analogWrite(ledPin, parlaklik); 
+  
+  // 4. Değerleri ekrandan takip et
+  Serial.print("Pot Degeri: ");
+  Serial.print(potDeger);
+  Serial.print(" | LED Parlakligi: ");
+  Serial.println(parlaklik);
+  
+  delay(50);
+}
+
+
+
+///////////////////////////////////////////////
+
+const int trigPin = 9;
+const int echoPin = 10;
+
+long sure;
+int mesafe;
+
+void setup() {
+  pinMode(trigPin, OUTPUT); // Ses dalgası gönderen pin
+  pinMode(echoPin, INPUT);  // Yankıyı dinleyen pin
+  Serial.begin(9600);       // Değerleri ekranda görmek için
+}
+
+void loop() {
+  // 1. Sensörün temiz bir sinyal göndermesi için Trig pinini sıfırla
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  
+  // 2. 10 mikrosaniyelik bir ses dalgası gönder
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  // 3. Yankının dönme süresini ölç (mikrosaniye cinsinden)
+  sure = pulseIn(echoPin, HIGH);
+  
+  // 4. Süreyi santimetre cinsinden mesafeye çevir
+  mesafe = sure * 0.034 / 2;
+  
+  // 5. Sonucu Seri Port Ekranına yazdır
+  Serial.print("Mesafe: ");
+  Serial.print(mesafe);
+  Serial.println(" cm");
+  
+  delay(100); // Ölçümlerin birbirine karışmaması için kısa bir bekleme
+}
+
+
+////////////////////////////////////////////////////////////
+
+const int trigPin = 9;
+const int echoPin = 10;
+
+// 5 adet LED'in bağlı olduğu pinler
+const int ledPinleri[] = {2, 3, 4, 5, 6}; 
+
+long sure;
+int mesafe;
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  
+  // Bir for döngüsü ile 5 LED pinini de ÇIKIŞ (OUTPUT) olarak ayarlıyoruz
+  for(int i = 0; i < 5; i++) {
+    pinMode(ledPinleri[i], OUTPUT);
+  }
+  
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Mesafe okuma işlemleri
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  sure = pulseIn(echoPin, HIGH);
+  mesafe = sure * 0.034 / 2;
+  
+  Serial.print("Mesafe: ");
+  Serial.println(mesafe);
+  
+  // Mesafeye göre LED'leri yakıp söndürme mantığı
+  // Cisim yaklaştıkça yanan LED sayısı artar.
+  
+  if (mesafe < 50) digitalWrite(ledPinleri[0], HIGH); 
+  else digitalWrite(ledPinleri[0], LOW);
+  
+  if (mesafe < 40) digitalWrite(ledPinleri[1], HIGH); 
+  else digitalWrite(ledPinleri[1], LOW);
+  
+  if (mesafe < 30) digitalWrite(ledPinleri[2], HIGH); 
+  else digitalWrite(ledPinleri[2], LOW);
+  
+  if (mesafe < 20) digitalWrite(ledPinleri[3], HIGH); 
+  else digitalWrite(ledPinleri[3], LOW);
+  
+  if (mesafe < 10) digitalWrite(ledPinleri[4], HIGH); // En yakın (Tehlike)
+  else digitalWrite(ledPinleri[4], LOW);
+  
+  delay(50);
+}
+
+///////////////////////////////////////////////////////////////
+
+
+const int butonPini = 7; 
+const int ledPini = 8;   
+
+void setup() {
+  pinMode(ledPini, OUTPUT);
+  // INPUT_PULLUP ile Arduino'nun içindeki direnci aktif ediyoruz
+  pinMode(butonPini, INPUT_PULLUP); 
+}
+
+void loop() {
+  // Butonun durumunu oku
+  int butonDurumu = digitalRead(butonPini);
+
+  // Butona basıldığında (durum LOW olduğunda) LED'i yak
+  if (butonDurumu == LOW) {
+    digitalWrite(ledPini, HIGH);
+  } 
+  // Basılmadığında (durum HIGH olduğunda) LED'i söndür
+  else {
+    digitalWrite(ledPini, LOW);
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+
+const int butonPini = 7;
+const int ledPini = 8;
+
+int ledDurumu = LOW;         // LED'in anlık durumunu hafızada tutarız
+int sonButonDurumu = HIGH;   // Butonun bir önceki döngüdeki durumu (PULLUP olduğu için ilk hali HIGH)
+
+void setup() {
+  pinMode(ledPini, OUTPUT);
+  pinMode(butonPini, INPUT_PULLUP);
+}
+
+void loop() {
+  int anlikButonDurumu = digitalRead(butonPini);
+
+  // Eğer butonun durumu değişmişse ve yeni durum LOW (basılı) ise:
+  if (anlikButonDurumu == LOW && sonButonDurumu == HIGH) {
+    
+    // LED kapalıysa aç, açıksa kapat
+    if (ledDurumu == LOW) {
+      ledDurumu = HIGH;
+    } else {
+      ledDurumu = LOW;
+    }
+    
+    // Yeni durumu LED'e gönder
+    digitalWrite(ledPini, ledDurumu);
+    
+    // Ark (debounce) engelleme: Butonun içindeki mekanik yaylanmayı es geçmek için
+    delay(50); 
+  }
+
+  // Bir sonraki döngü için şu anki durumu "son durum" olarak kaydet
+  sonButonDurumu = anlikButonDurumu;
+}
+
+
+
