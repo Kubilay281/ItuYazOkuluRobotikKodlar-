@@ -59,6 +59,33 @@ void loop() {
 
 
 //////////////////////////////////////////////////////
+#include <Servo.h>
+
+Servo myservo;
+
+int potpin = A0;  // analog pin A0
+int val;
+
+void setup() {
+  myservo.attach(9);         // Servo pin
+  Serial.begin(9600);        // Seri haberleşmeyi başlat
+}
+
+void loop() {
+  val = analogRead(potpin);             // 0 - 1023
+  int angle = map(val, 0, 1023, 0, 180); // 0 - 180 dereceye ölçekle
+
+  myservo.write(angle);                // Servoyu pozisyona getir
+
+  Serial.print("Potansiyometre Degeri: ");
+  Serial.print(val);
+  Serial.print(" | Servo Aci: ");
+  Serial.print(angle);
+  Serial.println(" derece");
+
+  delay(15);
+}
+//////////////////////////////////////////////////////
 
 
 
