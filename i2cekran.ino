@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
-
+// Arkadaşlar SDA A4 , SCL A5 pinidir.
 // İlk parametre I2C adresi (genellikle 0x27 veya 0x3F'dir).
 // İkinci parametre sütun sayısı (16), üçüncü parametre satır sayısı (2).
 LiquidCrystal_I2C lcd(0x27, 16, 2); 
